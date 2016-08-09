@@ -1,7 +1,3 @@
-/**
- * Created by robin on 16/6/28.
- */
-
 var Chat = function (socket) {
     this.socket = socket;
 };

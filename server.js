@@ -1,56 +1,37 @@
-var http = require('http');
-var fs = require('fs');
-var path = require('path');
-var mime = require('mime');
-var cache = {};
+let fs       = require('fs');
+let path     = require('path');
+let express  = require('express');
+let app      = express();
+let ejs      = require('ejs');
+let favicon  = require('serve-favicon');
+let router   = require('./router.js');
+let imServer = require('./lib/chat_server.js');
 
-function send404(response) {
-    response.writeHead(404, {'Content-Type': "text/plain"});
-    response.write('Error 404: resource not found.');
-    response.end();
-}
+/* express中间件 */ 
+let logger       = require('morgan');
+let bodyParser   = require('body-parser');
 
-function sendFile(response, filePath, fileContents) {
-    response.writeHead(200, {"content-type": mime.lookup(path.basename(filePath))});
-    response.end(fileContents);
-}
+/* 这种模板引擎 */
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'html');
+app.engine('.html', ejs.__express);
 
-function serverStatic(response, cache, absPath) {
-    console.log("absPath is :" + absPath);
-    if (cache[absPath]) {
-        sendFile(response, absPath, cache[absPath]);
-    } else {
-        fs.exists(absPath, function (exists) {
-            if (exists) {
-                fs.readFile(absPath, function (err, data) {
-                    if (err) {
-                        send404(response);
-                    } else {
-                        cache[absPath] = data;
-                        sendFile(response, absPath, data);
-                    }
-                });
-            } else {
-                send404(response);
-            }
-        });
-    }
-}
+/* post参数的解析 */ 
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
 
-var server = http.createServer(function (request, response) {
-    var filePath = false;
-    if (request.url == "/") {
-        filePath = 'public/index.html';
-    } else {
-        filePath = 'public' + request.url;
-    }
-    var absPath = './' + filePath;
-    serverStatic(response, cache, absPath);
-});
+/* 日志 */
+let accessLog = fs.createWriteStream('log/access.log', {flags: 'a'});
+app.use(logger('dev'));
+app.use(logger({stream: accessLog}));	
 
-server.listen(3000, function () {
-    console.log("Server listening on port 3000.");
-});
+/* 设定静态文件目录 */
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(favicon(__dirname + '/public/favicon.ico'));
 
-var chatServer = require('./lib/chat_server.js');
-chatServer.listen(server);
+/* 添加路由 */
+app.use(router);
+
+/* 监听端口并启用 */
+let server = app.listen(3000);
+imServer.listen( server );

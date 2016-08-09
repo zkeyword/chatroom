@@ -1,7 +1,3 @@
-/**
- * Created by robin on 16/6/28.
- */
-
 function divEscapedContentElement(message) {
     return $('<div></div>').text(message);
 }
