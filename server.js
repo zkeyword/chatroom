@@ -1,15 +1,20 @@
-let fs       = require('fs');
-let path     = require('path');
-let express  = require('express');
-let app      = express();
-let ejs      = require('ejs');
-let favicon  = require('serve-favicon');
-let router   = require('./router.js');
-let imServer = require('./lib/chat_server.js');
+let fs         = require('fs');
+let path       = require('path');
+let express    = require('express');
+let app        = express();
+let ejs        = require('ejs');
+let favicon    = require('serve-favicon');
+let logger     = require('morgan');
+let bodyParser = require('body-parser');
+let server     = require('http').createServer(app);
+let io         = global.io = require('socket.io')(server);
+let router     = require('./router.js');
+let imServer   = require('./lib/chat_server.js');
 
-/* express中间件 */ 
-let logger       = require('morgan');
-let bodyParser   = require('body-parser');
+/* 监听端口并启用 */
+server.listen(3000, function () {
+  console.log('Server listening at port %d', 3000);
+});
 
 /* 这种模板引擎 */
 app.set('views', path.join(__dirname, 'views'));
@@ -31,7 +36,3 @@ app.use(favicon(__dirname + '/public/favicon.ico'));
 
 /* 添加路由 */
 app.use(router);
-
-/* 监听端口并启用 */
-let server = app.listen(3000);
-imServer.listen( server );

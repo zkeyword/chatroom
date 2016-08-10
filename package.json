@@ -6,12 +6,12 @@
     "body-parser": "*",
     "ejs": "*",
     "express": "*",
-    "mkdirp": "^0.5.1",
+    "mkdirp": "*",
     "mongoose": "*",
     "morgan": "*",
-    "serve-favicon": "^2.3.0",
+    "serve-favicon": "*",
     "socket.io": "*",
-    "xss": "^0.2.13"
+    "xss": "*"
   },
   "devDependencies": {
     "gulp": "^3.9.1",
