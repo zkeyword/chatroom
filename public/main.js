@@ -190,6 +190,12 @@ $(function() {
 
   // Keyboard events
 
+	$loginPage.fadeOut();
+	$chatPage.show();
+	$loginPage.off('click');
+	$currentInput = $inputMessage.focus();
+  
+  
   $window.keydown(function (event) {
     // Auto-focus the current input when a key is typed
     if (!(event.ctrlKey || event.metaKey || event.altKey)) {
@@ -197,12 +203,13 @@ $(function() {
     }
     // When the client hits ENTER on their keyboard
     if (event.which === 13) {
+		username = cleanInput($usernameInput.val().trim());
       if (username) {
         sendMessage();
         socket.emit('stop typing');
         typing = false;
       } else {
-        setUsername();
+        //setUsername();
       }
     }
   });

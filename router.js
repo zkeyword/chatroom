@@ -1,14 +1,9 @@
 let express  = require('express'),
-	router   = express.Router(),
-	imServer = require('./lib/chat_server.js');
-
-router.get('/', function(req, res) {
-    res.render('index', { title: 'index' });
-});
+	router   = express.Router();
 
 router.get('/im', function(req, res) {
-	imServer.start( global.io );
-    res.render('index', { title: 'index' });
+	global.user = req.query.user;
+    res.render('index', { username: req.query.user });
 });
 	
 module.exports = router;
